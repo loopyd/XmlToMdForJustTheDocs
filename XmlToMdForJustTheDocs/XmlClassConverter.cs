@@ -20,9 +20,10 @@ public class XmlClassConverter
 
         var versionFolder = outputFolder.CreateChildFolder(options.Version);
         var assemblyFolder = versionFolder.CreateChildFolder(documentation.Assembly.Name);
+        var md = new MdGenerator();
+
         foreach (var member in documentation.Members.MembersList)
         {
-            var md = new MdGenerator();
             var jtd = new Jtd
             {
                 Title = member.Namespace + "." + member.MemberName,

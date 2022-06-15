@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
@@ -44,7 +45,8 @@ public class Summary : IXmlSerializable
                     case "see":
                         var member = new Member();
                         member.Name = element.Attribute("cref").Value;
-                        sb.Append(member.MemberName + " ");
+                        sb.Append($"{{{See.Count}}} ");
+                        See.Add(member);
                         break;
                     case "remarks":
                         Remarks.Add(element.Value);
@@ -57,7 +59,10 @@ public class Summary : IXmlSerializable
             }
             else
             {
-                sb.Append((node as XText).Value.Trim() + " ");
+                sb.Append((node as XText).Value
+                    .Replace("\n", " ")
+                    .RemovePadding()
+                    .Trim() + " ");
             }
         }
     }

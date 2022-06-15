@@ -4,12 +4,42 @@
         <name>PrecomputedCulling</name>
     </assembly>
     <members>
+        <member name="T:ProgLibrary.PrecomputedCulling.Utils.PrecomputedAreaExtensions">
+            <summary>
+                Static method to get cells and bake spots of PrecomputedArea
+            </summary>
+        </member>
+        <member name="T:ProgLibrary.PrecomputedCulling.Utils.PrecomputedAreaExtensions.CameraIterator">
+            <summary>
+                Information about bake spots for visible test
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.Utils.PrecomputedAreaExtensions.CameraIterator.CameraPosition">
+            <summary>
+                Bake spot position to set camera during bake
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.Utils.PrecomputedAreaExtensions.CameraIterator.GetClampedIndex">
+            <summary>
+                Flatten index to know current bake progress
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.Utils.PrecomputedAreaExtensions.CameraIterator.#ctor(UnityEngine.Vector3Int@,UnityEngine.Vector3Int@,UnityEngine.Vector3@,ProgLibrary.PrecomputedCulling.DataModels.BoundingBox@)">
+            <summary>
+                Constructor
+            </summary>
+            <param name="index"></param>
+            <param name="density"></param>
+            <param name="cameraPosition"></param>
+            <param name="box"></param>
+        </member>
         <member name="M:ProgLibrary.PrecomputedCulling.Utils.PrecomputedAreaExtensions.CameraPositionIterator(ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea,ProgLibrary.PrecomputedCulling.DataModels.BoundingBox)">
             <summary>
                 Iterates over all possible camera locations within given occlusion area with cell at given flattend index
             </summary>
-            <param name="precomputedArea">Occlusion area</param>
-            <param name="index">Index of the cell</param>
+            <param name="precomputedArea">Precomputed area</param>
+            <param name="box">BoundingBox of volume</param>
             <returns></returns>
         </member>
         <member name="M:ProgLibrary.PrecomputedCulling.Utils.PrecomputedAreaExtensions.GetCellBox(ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea,System.Int32)">
@@ -19,6 +49,11 @@
             <param name="precomputedArea">Occlusion area</param>
             <param name="index">Index of the cell</param>
             <returns></returns>
+        </member>
+        <member name="T:ProgLibrary.PrecomputedCulling.Utils.ComputeShaderUtilities">
+            <summary>
+                Shader management for culling
+            </summary>
         </member>
         <member name="M:ProgLibrary.PrecomputedCulling.Utils.ComputeShaderUtilities.CreateValueBuffer``1(``0,UnityEngine.ComputeBufferType)">
             <summary>
@@ -33,7 +68,7 @@
             <summary>
                 Creates compute buffer of given simple type T for single value
             </summary>
-            <param name="startingValue">Default starting value</param>
+            <param name="count">Default starting value</param>
             <param name="type">Type of compute buffer</param>
             <typeparam name="T">Simple type</typeparam>
             <returns></returns>
@@ -42,7 +77,7 @@
             <summary>
                 Creates compute buffer of given simple type T for single value
             </summary>
-            <param name="startingValue">Default starting value</param>
+            <param name="initialArray">Default starting array</param>
             <param name="type">Type of compute buffer</param>
             <typeparam name="T">Simple type</typeparam>
             <returns></returns>
@@ -65,7 +100,7 @@
             <param name="computeShader">Compute shader</param>
             <param name="kernelId">Kernel Id of the compute shader</param>
             <param name="name">Name of the property</param>
-            <param name="startingValue">Default starting value</param>
+            <param name="initialArray">Default starting array</param>
             <param name="type">Type of compute buffer</param>
             <typeparam name="T">Simple type</typeparam>
         </member>
@@ -76,7 +111,7 @@
             <param name="computeShader">Compute shader</param>
             <param name="kernelId">Kernel Id of the compute shader</param>
             <param name="name">Name of the property</param>
-            <param name="startingValue">Default starting value</param>
+            <param name="count">Default starting value</param>
             <param name="type">Type of compute buffer</param>
             <typeparam name="T">Simple type</typeparam>
         </member>
@@ -94,6 +129,7 @@
                 Get value from compute buffer of single value
             </summary>
             <param name="buffer"></param>
+            <param name="count"></param>
             <param name="clearBuffer"></param>
             <typeparam name="T"></typeparam>
             <returns></returns>
@@ -105,6 +141,11 @@
             <typeparam name="T">Simple type T</typeparam>
             <returns></returns>
             <exception cref="T:System.ArgumentException">Type not supported</exception>
+        </member>
+        <member name="T:ProgLibrary.PrecomputedCulling.Utils.ArrayUtils">
+            <summary>
+                Management of multidimensional arrays
+            </summary>
         </member>
         <member name="M:ProgLibrary.PrecomputedCulling.Utils.ArrayUtils.FlattenArrayIndex(System.Int32@,System.Int32@,System.Int32@)">
             <summary>
@@ -177,362 +218,24 @@
             <typeparam name="T"></typeparam>
             <returns></returns>
         </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.IdCubemapCamera._diffComputeShader">
+        <member name="T:ProgLibrary.PrecomputedCulling.Settings.BakeAlgorithm">
             <summary>
-                Compute shader used to calculate diff of the textures
+                Types of algorithms
             </summary>
         </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.IdCubemapCamera.ProgIdDiffComputeShader">
+        <member name="F:ProgLibrary.PrecomputedCulling.Settings.BakeAlgorithm.ColorIdCubeMap">
             <summary>
-                Compute shader name
+                Map texture colors based algorithm
             </summary>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.IdCubemapCamera.ZOrderBakeContainers">
-            <summary>
-                Temporary list of zOrdered bake containers required for rendering
-            </summary>
-        </member>
-        <member name="P:ProgLibrary.PrecomputedCulling.MonoBehaviours.IdCubemapCamera.DiffComputeShader">
-            <summary>
-                Compute shader used to calculate diff of the textures
-            </summary>
-        </member>
-        <member name="P:ProgLibrary.PrecomputedCulling.MonoBehaviours.IdCubemapCamera.Settings">
-            <inheritdoc />
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.IdCubemapCamera.Prepare(ProgLibrary.PrecomputedCulling.Settings.PrecomputedBakeIdCubemapSettings@,UnityEngine.Vector3,System.Int32,ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea)">
-            <summary>
-                Prepare camera for testing visibility
-            </summary>
-            <param name="settings"></param>
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.IdCubemapCamera.TestVisibility(ProgLibrary.PrecomputedCulling.Settings.PrecomputedBakeIdCubemapSettings,UnityEngine.Vector3,System.Int32,ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea)">
-            <inheritdoc />
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.IdCubemapCamera.GetLastCameraRenderer">
-            <summary>
-                Temporary list of zOrdered bake containers required for rendering
-            </summary>
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.IdCubemapCamera.TestRenderersVisibility">
-            <summary>
-                Perform a test from given camera position
-            </summary>
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.IdCubemapCamera.ComputeFinalVisibility">
-            <summary>
-                Compute final object visibility
-            </summary>
-        </member>
-        <member name="T:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingRenderPipeline">
-            <summary>
-                Scriptable renderer pipeline for color coding the objects in the scene
-            </summary>
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingRenderPipeline.#ctor(UnityEngine.Rendering.Universal.ScriptableRendererData)">
-            <inheritdoc />
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingRenderPipeline.Setup(UnityEngine.Rendering.ScriptableRenderContext,UnityEngine.Rendering.Universal.RenderingData@)">
-            <inheritdoc />
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer.ZOrderBakeContainers">
-            <summary>
-                Temporary list of zOrdered bake containers required for rendering
-            </summary>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer.BufferName">
-            <summary>
-                Command buffer name
-            </summary>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer._context">
-            <summary>
-                Scriptable render context of current execution
-            </summary>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer._camera">
-            <summary>
-                Currently renderer camera
-            </summary>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer._buffer">
-            <summary>
-                Current command buffer
-            </summary>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer._originalMaterial">
-            <summary>
-                Original material used to generate other for this rendering pipeline
-            </summary>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer._materialsList">
-            <summary>
-                Cache for materials used for current rendering
-            </summary>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer.ColorIndexPropertyId">
-            <summary>
-                Color Index shader property id
-            </summary>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer._settings">
-            <summary>
-                Settings used to display given cubemap -- uses default values if not provided
-            </summary>
-        </member>
-        <member name="P:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer.OriginalMaterial">
-            <summary>
-                Original material used to generate other for this rendering pipeline
-            </summary>
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer.Render(UnityEngine.Rendering.ScriptableRenderContext,UnityEngine.Camera)">
-            <summary>
-                Render entry point
-            </summary>
-            <param name="context"></param>
-            <param name="camera"></param>
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer.Setup">
-            <summary>
-                Setup rendering process by clearing the screen
-            </summary>
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer.DrawVisibleGeometry">
-            <summary>
-                Draws geometry
-            </summary>
-            <exception cref="T:System.ArgumentOutOfRangeException"></exception>
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer.IsMaterialTransparent(UnityEngine.Material)">
-            <summary>
-                Check if requested material is Transparent and can be a valid Occluder or Occludee
-            </summary>
-            <param name="material">Material to check</param>
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer.Submit">
-            <summary>
-                Submit buffer and end sample for profiler
-            </summary>
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer.ExecuteBuffer">
-            <summary>
-                Execute buffer
-            </summary>
-        </member>
-        <member name="T:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingRenderPipelineAsset">
-            <summary>
-                Custom rendering pipeline asset to color code objects with appropriate index
-            </summary>
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingRenderPipelineAsset.Create">
-            <inheritdoc />
-        </member>
-        <member name="P:ProgLibrary.PrecomputedCulling.MonoBehaviours.IVisibilityTester`1.Settings">
-            <summary>
-                Settings used with current camera, can be null if not during testing visibility
-            </summary>
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.IVisibilityTester`1.TestVisibility(`0,UnityEngine.Vector3,System.Int32,ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea)">
-            <summary>
-                Performs visibility test over all cameras locations
-            </summary>
-            <param name="settings">Occlusion bake settings</param>
-            <param name="scriptableRendererIndex">Renderer index for <see cref="M:UnityEngine.Rendering.Universal.UniversalAdditionalCameraData.SetRenderer(System.Int32)"/></param>
-            <param name="occlusionVisibilityIndices">Result of the visibility generation</param>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea.Box">
-            <summary>
-                Bounding box of the occlusion area
-            </summary>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea.precomputedData">
-            <summary>
-                Occlusion data that this occlusion area is using
-            </summary>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea.CellsDivisions">
-            <summary>
-                Amount of cells in this volume in 3d dimension
-            </summary>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea.settingsArea">
-            <summary>
-                Area settings
-            </summary>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea.Priority">
-            <summary>
-                Priority, which occlusion area is used when two are overlapping, higher priority will be used
-            </summary>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea.BakeTransparent">
-            <summary>
-                Transparent objects should get occluded
-            </summary>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea.BakeSprites">
-            <summary>
-                Occlusion Culling should see sprites
-            </summary>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea.BakeTerrain">
-            <summary>
-                Occlusion Culling should calculate terrain
-            </summary>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea._isSceneViewCameraPreview">
-            <summary>
-                Cells visualization
-            </summary>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea._isVisualizeBakeSpots">
-            <summary>
-                Bake spots visualization
-            </summary>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea._isDrawVisibleOnCellSelect">
-            <summary>
-                ShowOcclusionData visualization
-            </summary>
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea.GetVisibleRenderers(UnityEngine.Vector3@,ProgLibrary.PrecomputedCulling.DataModels.SceneData.PrecomputedSceneData@,System.Collections.Generic.List{ProgLibrary.PrecomputedCulling.DataModels.PrecomputedVisibilityIndices}@,ProgLibrary.PrecomputedCulling.PrecomputedCamera@)">
-            <summary>
-                Get all renderers visible from given position
-            </summary>
-            <param name="vector3"></param>
-            <param name="targetScene"></param>
-            <param name="indices"></param>
-            <returns></returns>
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea.GetVisibleRenderers(System.Int32@,System.Int32@,ProgLibrary.PrecomputedCulling.DataModels.SceneData.PrecomputedSceneData@,ProgLibrary.PrecomputedCulling.DataModels.PrecomputedVisibilityIndices@)">
-            <summary>
-                Get all renderers visible from given position
-            </summary>
-            <param name="targetScene"></param>
-            <param name="indices"></param>
-            <param name="xIndex"></param>
-            <param name="yIndex"></param>
-            <returns></returns>
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea.CalculateChunkPosition(System.Int32@)">
-            <summary>
-                Calculates position in Vector3 space for given index
-            </summary>
-            <param name="index">Index of the chunk</param>
-            <returns>Position in the middle of the chunk</returns>
-            <remarks>
-                Assume that positive X and positive Y are [0,0] - and thus indexes are towards negative eg: [0, -1] is index
-                1, [-1, 0] is index 64
-            </remarks>
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea.GetPositionFromIndex(System.Int32@)">
-            <summary>
-                Get position in 2D space from flattened array index
-            </summary>
-            <param name="index">Index</param>
-            <returns></returns>
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.CameraMatrixUtils.BoxToViewportAndDepth(UnityEngine.Camera,ProgLibrary.PrecomputedCulling.DataModels.BoundingBox)">
-            <summary>
-                Using bounding box of the object, calculates Viewport values (Rect) in [0,1] as well as distance from camera (depth) of the furthest points in the box
-            </summary>
-            <param name="camera">Camera to view from</param>
-            <param name="box">Box to calculate against</param>
-            <returns></returns>
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.CameraMatrixUtils.PerspectiveOffCenter(UnityEngine.Camera,System.Single@,System.Single@,System.Single@,System.Single@)">
-            <summary>
-                Calculates camera view Frustum using left, right, bottom, top values via matrix multipication
-            </summary>
-            <param name="camera">Camera to calculate matrix from</param>
-            <param name="left">Left value of the view frustum</param>
-            <param name="right">Right value of view frustum</param>
-            <param name="bottom">Bottom value of the view frustum</param>
-            <param name="top">Top value of the view frustum</param>
-            <returns></returns>
-        </member>
-        <member name="T:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera">
-            <summary>
-                Specialized script that controls the camera to always center on <see cref="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera._targetObject" /> and sets view frustum
-                directly at the object.
-            </summary>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera._targetObject">
-            <summary>
-                Object to test against
-            </summary>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera._diffComputeShader">
-            <summary>
-                Compute shader used to calculate diff of the textures
-            </summary>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera._farV">
-            <summary>
-                Cache array to get far view frustum positions
-            </summary>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera._rectV">
-            <summary>
-                Cache array to get object view frustum positions
-            </summary>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera._bottom">
-            <summary>
-                View frustum bottom position
-            </summary>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera._left">
-            <summary>
-                View frustum left position
-            </summary>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera._right">
-            <summary>
-                View frustum right position
-            </summary>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera._top">
-            <summary>
-                View frustum top position
-            </summary>
-        </member>
-        <member name="P:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera.DiffComputeShader">
-            <summary>
-                Compute shader used to calculate diff of the textures
-            </summary>
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera.Prepare(ProgLibrary.PrecomputedCulling.Settings.PrecomputedBakeTargetedFrustumSettings@,UnityEngine.Vector3,System.Int32)">
-            <summary>
-                Prepare for visibility test
-            </summary>
-        </member>
-        <member name="P:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera.Settings">
-            <inheritdoc />
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera.TestVisibility(ProgLibrary.PrecomputedCulling.Settings.PrecomputedBakeTargetedFrustumSettings,UnityEngine.Vector3,System.Int32,ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea)">
-            <inheritdoc />
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera.TestRendererVisibility">
-            <summary>
-                Perform a test of a single renderer visibility
-            </summary>
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera.ComputeFinalVisibility">
-            <summary>
-                Compute final object visibility
-            </summary>
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera.SetCameraFrustumAtTarget(UnityEngine.Camera,ProgLibrary.PrecomputedCulling.DataModels.SceneData.PrecomputedRendererBakeContainer)">
-            <summary>
-                Set camera view frustum at target
-            </summary>
-            <param name="camera">Camera to position view frustum of</param>
-            <param name="target">Target mesh filter</param>
         </member>
         <member name="T:ProgLibrary.PrecomputedCulling.Settings.PrecomputedSettingsArea">
             <summary>
                 Global occlusion settings to be displayed in the editor
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.Settings.PrecomputedSettingsArea.Algorithm">
+            <summary>
+                Current selected precomputed algorithm
             </summary>
         </member>
         <member name="F:ProgLibrary.PrecomputedCulling.Settings.PrecomputedSettingsArea.PrecomputedBakeCameraSettings">
@@ -558,6 +261,11 @@
         <member name="F:ProgLibrary.PrecomputedCulling.Settings.PrecomputedBakeCameraSettings.CellDepthTestDensityOffset">
             <summary>
                 How samples should be offseted along the cell box
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.Settings.PrecomputedBakeCameraSettings.VisibleTransparent">
+            <summary>
+                Transparent materials are visible and use them in bake
             </summary>
         </member>
         <member name="T:ProgLibrary.PrecomputedCulling.Settings.PrecomputedBaseBakeSettings">
@@ -589,6 +297,11 @@
                 unless you are experiencing critical errors with the bake generation.
             </summary>
         </member>
+        <member name="T:ProgLibrary.PrecomputedCulling.Settings.PrecomputedBakeIdCubemapSettings">
+            <summary>
+                Bake camera settings used to precompute Occlusion Data
+            </summary>
+        </member>
         <member name="F:ProgLibrary.PrecomputedCulling.Settings.PrecomputedBakeIdCubemapSettings.CubemapResolution">
             <summary>
                 Base cube map resolution to generate
@@ -616,6 +329,26 @@
         <member name="T:ProgLibrary.PrecomputedCulling.DataModels.SceneData.ValidOccluderEnum">
             <summary>
                 Occlusion validation enum
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.DataModels.SceneData.ValidOccluderEnum.Invalid">
+            <summary>
+                All materials are invalid
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.DataModels.SceneData.ValidOccluderEnum.PartiallyValid">
+            <summary>
+                Partially valid materials
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.DataModels.SceneData.ValidOccluderEnum.FullyValid">
+            <summary>
+                Only valid materials
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.DataModels.SceneData.ValidOccluderEnum.NotInitialized">
+            <summary>
+                Pre initialize status
             </summary>
         </member>
         <member name="T:ProgLibrary.PrecomputedCulling.DataModels.SceneData.PrecomputedRendererBakeContainer">
@@ -674,6 +407,7 @@
             <param name="material"></param>
             <param name="isValidOccluder"></param>
             <param name="totalMaterials"></param>
+            <param name="isTransparentValid"></param>
         </member>
         <member name="P:ProgLibrary.PrecomputedCulling.DataModels.SceneData.PrecomputedRendererBakeContainer.RendererId">
             <inheritdoc />
@@ -704,6 +438,7 @@
             <summary>
                 Default constructor
             </summary>
+            <param name="index"></param>
             <param name="renderer">Mesh renderer to assign</param>
         </member>
         <member name="M:ProgLibrary.PrecomputedCulling.DataModels.SceneData.PrecomputedMeshRendererContainer.GetBoundingBox">
@@ -711,6 +446,11 @@
         </member>
         <member name="M:ProgLibrary.PrecomputedCulling.DataModels.SceneData.PrecomputedMeshRendererContainer.IsValid">
             <inheritdoc />
+        </member>
+        <member name="T:ProgLibrary.PrecomputedCulling.DataModels.SceneData.Abstract.IPrecomputedRendererContainer">
+            <summary>
+              Renderer Container methods
+            </summary>
         </member>
         <member name="P:ProgLibrary.PrecomputedCulling.DataModels.SceneData.Abstract.IPrecomputedRendererContainer.RendererId">
             <summary>
@@ -825,6 +565,12 @@
             </summary>
             <typeparam name="T"></typeparam>
         </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.DataModels.SceneData.Abstract.PrecomputedRendererContainer`1.Renderer">
+            <see cref="F:ProgLibrary.PrecomputedCulling.DataModels.SceneData.Abstract.PrecomputedRendererContainer`1.Renderer"/>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.DataModels.SceneData.Abstract.PrecomputedRendererContainer`1.#ctor(System.Int32@,`0)">
+            <inheritdoc />
+        </member>
         <member name="P:ProgLibrary.PrecomputedCulling.DataModels.SceneData.Abstract.PrecomputedRendererContainer`1.GameObject">
             <inheritdoc />
         </member>
@@ -877,6 +623,22 @@
         </member>
         <member name="M:ProgLibrary.PrecomputedCulling.DataModels.SceneData.PrecomputedChunkElementData.GetHashCode">
             <inheritdoc />
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.DataModels.SceneData.PrecomputedChunkElementData.op_Equality(ProgLibrary.PrecomputedCulling.DataModels.SceneData.PrecomputedChunkElementData,ProgLibrary.PrecomputedCulling.DataModels.SceneData.PrecomputedChunkElementData)">
+            <summary>
+                Comparison operator Equals
+            </summary>
+            <param name="left"></param>
+            <param name="right"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.DataModels.SceneData.PrecomputedChunkElementData.op_Inequality(ProgLibrary.PrecomputedCulling.DataModels.SceneData.PrecomputedChunkElementData,ProgLibrary.PrecomputedCulling.DataModels.SceneData.PrecomputedChunkElementData)">
+            <summary>
+                Comparison operator not Equals
+            </summary>
+            <param name="left"></param>
+            <param name="right"></param>
+            <returns></returns>
         </member>
         <member name="T:ProgLibrary.PrecomputedCulling.DataModels.SceneData.PrecomputedSceneBakeData">
             <summary>
@@ -1050,7 +812,6 @@
                 Find all scene renderers and create <see cref="T:ProgLibrary.PrecomputedCulling.DataModels.SceneData.Abstract.IPrecomputedRendererContainer" /> from them
             </summary>
             <param name="objects"></param>
-            <param name="renderers"></param>
         </member>
         <member name="M:ProgLibrary.PrecomputedCulling.DataModels.SceneData.PrecomputedSceneData.ShowAll">
             <summary>
@@ -1203,6 +964,12 @@
             <param name="inputPoint">Point to look for closes point from</param>
             <returns></returns>
         </member>
+        <member name="T:ProgLibrary.PrecomputedCulling.DataModels.PrecomputedDataVariant">
+            <summary>
+                Bake variant data
+                Gather precomputedData on all variant scenes
+            </summary>
+        </member>
         <member name="F:ProgLibrary.PrecomputedCulling.DataModels.PrecomputedDataVariant.OcclusionDatas">
             <summary>
                 List of all scenes occlusions data
@@ -1230,12 +997,17 @@
         </member>
         <member name="F:ProgLibrary.PrecomputedCulling.DataModels.PrecomputedChunkData.Width">
             <summary>
-                Amount of horizontal cells in this chunk
+                Amount of x cells in this chunk
             </summary>
         </member>
         <member name="F:ProgLibrary.PrecomputedCulling.DataModels.PrecomputedChunkData.Height">
             <summary>
-                Amount of vertical cells in this chunk
+                Amount of y cells in this chunk
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.DataModels.PrecomputedChunkData.Length">
+            <summary>
+                Amount of z cells in this chunk
             </summary>
         </member>
         <member name="F:ProgLibrary.PrecomputedCulling.DataModels.PrecomputedChunkData.Box">
@@ -1253,16 +1025,6 @@
                  Chunks of indexes of the renderers
             </summary>
         </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.DataModels.PrecomputedChunkData.GetVisibleRenderers(System.Int32@,System.Int32@,ProgLibrary.PrecomputedCulling.Settings.PrecomputedSettingsArea@)">
-            <summary>
-                Get all visible renderers from current camera position
-                <remarks>View frustum is applied automatically</remarks>
-            </summary>
-            <param name="xIndex"></param>
-            <param name="yIndex"></param>
-            <param name="settingsArea">Settings used to generate this data</param>
-            <param name="indices">Return raw data for occlusion visibility</param>
-        </member>
         <member name="M:ProgLibrary.PrecomputedCulling.DataModels.PrecomputedChunkData.GetVisibleRenderers(UnityEngine.Vector3@,ProgLibrary.PrecomputedCulling.Settings.PrecomputedSettingsArea@,ProgLibrary.PrecomputedCulling.PrecomputedCamera@)">
             <summary>
                 Get all visible renderers from current camera position
@@ -1270,7 +1032,7 @@
             </summary>
             <param name="cameraPosition">Current camera position</param>
             <param name="settingsArea">Settings used to generate this data</param>
-            <param name="indices">Return raw data for occlusion visibility</param>
+            <param name="precomputedCamera">Current camera settings</param>
         </member>
         <member name="M:ProgLibrary.PrecomputedCulling.DataModels.PrecomputedChunkData.GetChunkIndex(UnityEngine.Vector3@)">
             <summary>
@@ -1288,6 +1050,9 @@
                 Get chunk index and array coordinates from camera position
             </summary>
             <param name="cameraPosition"></param>
+            <param name="x">X chunk id</param>
+            <param name="y">Y chunk id</param>
+            <param name="z">Z chunk id</param>
             <returns>Return index of the box or -1 if point is not without it's bounds</returns>
             <remarks>
                 Assume that positive X and positive Y are [0,0] - and thus indexes are towards negative eg: [0, -1] is index
@@ -1343,7 +1108,7 @@
         </member>
         <member name="T:ProgLibrary.PrecomputedCulling.DataModels.PrecomputedVisibilityIndices">
             <summary>
-                Struct to pass index result from <see cref="M:ProgLibrary.PrecomputedCulling.DataModels.PrecomputedChunkData.GetVisibleRenderers(System.Int32@,System.Int32@,ProgLibrary.PrecomputedCulling.Settings.PrecomputedSettingsArea@)" />
+                Struct to pass index result from <see cref="M:ProgLibrary.PrecomputedCulling.DataModels.PrecomputedChunkData.GetVisibleRenderers(UnityEngine.Vector3@,ProgLibrary.PrecomputedCulling.Settings.PrecomputedSettingsArea@,ProgLibrary.PrecomputedCulling.PrecomputedCamera@)" />
             </summary>
         </member>
         <member name="F:ProgLibrary.PrecomputedCulling.DataModels.PrecomputedVisibilityIndices.IsValid">
@@ -1379,6 +1144,7 @@
             <param name="groupRenderers">Group indexes of the renderers</param>
             <param name="settingsArea">Settings</param>
             <param name="isValid">Are indices empty and thus invalid</param>
+            <param name="precomputedCamera">current precomputed camera settings</param>
         </member>
         <member name="M:ProgLibrary.PrecomputedCulling.DataModels.PrecomputedVisibilityIndices.Empty">
             <summary>
@@ -1407,6 +1173,16 @@
                 Index of the occlusion data
             </summary>
         </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.DataModels.PrecomputedData.SceneName">
+            <summary>
+                Name of parent scene
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.DataModels.PrecomputedData.VariantId">
+            <summary>
+                Parent variant id
+            </summary>
+        </member>
         <member name="M:ProgLibrary.PrecomputedCulling.DataModels.PrecomputedData.GetVisibleRenderers(UnityEngine.Vector3@,ProgLibrary.PrecomputedCulling.DataModels.SceneData.PrecomputedSceneData@,ProgLibrary.PrecomputedCulling.Settings.PrecomputedSettingsArea@,System.Collections.Generic.List{ProgLibrary.PrecomputedCulling.DataModels.PrecomputedVisibilityIndices}@,ProgLibrary.PrecomputedCulling.PrecomputedCamera@)">
             <summary>
                 Get all renderers visible from given position
@@ -1415,18 +1191,7 @@
             <param name="settingsArea"></param>
             <param name="indices"></param>
             <param name="requestedScene"></param>
-            <returns></returns>
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.DataModels.PrecomputedData.GetVisibleRenderers(System.Int32@,System.Int32@,ProgLibrary.PrecomputedCulling.DataModels.SceneData.PrecomputedSceneData@,ProgLibrary.PrecomputedCulling.Settings.PrecomputedSettingsArea@,ProgLibrary.PrecomputedCulling.DataModels.PrecomputedVisibilityIndices@)">
-            <summary>
-                Get all renderers visible from given position
-            </summary>
-            <param name="vector3"></param>
-            <param name="settingsArea"></param>
-            <param name="indices"></param>
-            <param name="xIndex"></param>
-            <param name="yIndex"></param>
-            <param name="requestedScene"></param>
+            <param name="precomputedCamera"></param>
             <returns></returns>
         </member>
         <member name="M:ProgLibrary.PrecomputedCulling.DataModels.PrecomputedData.GetSizeInMemory">
@@ -1481,150 +1246,147 @@
                 Remove custom renderer from graphics settings
             </summary>
         </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedController._sceneData">
+        <member name="M:ProgLibrary.PrecomputedCulling.Shaders.CustomOcclusionScriptableRenderer.TestVisibility(ProgLibrary.PrecomputedCulling.MonoBehaviours.IVisibilityTester,ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea,UnityEngine.Vector3,System.Int32)">
             <summary>
-                Information about scene
+                Gather <see cref="T:ProgLibrary.PrecomputedCulling.DataModels.PrecomputedVisibilityIndices"/>
+            </summary>
+            <param name="visibilityTester"></param>
+            <param name="precomputedArea"></param>
+            <param name="cameraPosition"></param>
+            <param name="rendererIndex"></param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentOutOfRangeException"></exception>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.Shaders.CustomOcclusionScriptableRenderer.PrepareVisibilityTester(ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea,UnityEngine.GameObject@)">
+            <summary>
+                Configure bake tester camera
+            </summary>
+            <param name="precomputedArea"></param>
+            <param name="cameraObject"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ProgLibrary.PrecomputedCulling.PrecomputedCulling.DataModels.PrecomputedSceneVariantData">
+            <summary>
+                Variant information needed for baking and loading data
             </summary>
         </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedController._occlusionAreas">
+        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.DataModels.PrecomputedSceneVariantData.Name">
             <summary>
-                List of all occlusion areas
+                Variant name
             </summary>
         </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedController.CurrentLoadedVariantData">
+        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.DataModels.PrecomputedSceneVariantData.Scenes">
             <summary>
-                Data info of current loaded variant
+                SceneAsset included in variant
             </summary>
         </member>
-        <member name="P:ProgLibrary.PrecomputedCulling.PrecomputedController.SceneData">
+        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.DataModels.PrecomputedSceneVariantData.Priority">
             <summary>
-                Information about scene
+                Priority of use
             </summary>
         </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.#ctor">
+        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.DataModels.PrecomputedSceneVariantData.ScenesInVariant">
+            <summary>
+                Scenes included in variant, automatically generated during bake
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.DataModels.PrecomputedSceneVariantData.IndexVariant">
+            <summary>
+                Id to bind to data
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.DataModels.PrecomputedSceneVariantData.BakeTime">
+            <summary>
+                Bake Time in milliseconds
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.DataModels.PrecomputedSceneVariantData.SizeInMemory">
+            <summary>
+                Data size in memory in kb
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedCulling.DataModels.PrecomputedSceneVariantData.#ctor">
             <summary>
                 Default constructor
             </summary>
         </member>
-        <member name="P:ProgLibrary.PrecomputedCulling.PrecomputedController.RenderersCount">
+        <member name="T:ProgLibrary.PrecomputedCulling.PrecomputedCulling.DataModels.SceneData.PrecomputedSceneInfo">
             <summary>
-                Get renderers count
+                Stores important information about the scene for access them in the variant settings
             </summary>
         </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.Initialize_Editor">
+        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.DataModels.SceneData.PrecomputedSceneInfo.Occluders">
             <summary>
-                Initialize editor callbacks
+                All possible occluders on scene 
             </summary>
         </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.AddScene(UnityEngine.SceneManagement.Scene,System.Boolean)">
+        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.DataModels.SceneData.PrecomputedSceneInfo.Cells">
             <summary>
-                Add new sceneData
-            </summary>
-            <param name="sceneData"></param>
-            <param name="force"></param>
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.RemoveScene(UnityEngine.SceneManagement.Scene)">
-            <summary>
-                Remove scene
-            </summary>
-            <param name="scene"></param>
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.ForceReinitialize">
-            <summary>
-                Remove all items and reinitialize
+                All cells in every <see cref="T:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea"/> on scene 
             </summary>
         </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.GatherAllScenes">
+        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.DataModels.SceneData.PrecomputedSceneInfo.BakeSpots">
             <summary>
-                Gather all scenes
+                All bake spots in every <see cref="T:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea"/> on scene
             </summary>
         </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.LoadPrecomputedData">
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedCulling.DataModels.SceneData.PrecomputedSceneInfo.#ctor(System.Int32,System.Int32,System.Int32)">
             <summary>
-                Load occlusionData from variant for current scenes
+                Default constructor
+            </summary>
+            <param name="occluders"></param>
+            <param name="cells"></param>
+            <param name="bakeSpots"></param>
+        </member>
+        <member name="T:ProgLibrary.PrecomputedCulling.PrecomputedCulling.DataModels.PrecomputedSceneAreaData">
+            <summary>
+                Variance data to be correlated with the scene
             </summary>
         </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.OnSceneLoaded(UnityEngine.SceneManagement.Scene,UnityEngine.SceneManagement.LoadSceneMode)">
+        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.DataModels.PrecomputedSceneAreaData.VariantId">
             <summary>
-                Event when new scene is loaded
+                Variant index  <see cref="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.DataModels.PrecomputedSceneVariantData.IndexVariant"/>
             </summary>
-            <param name="scene"></param>
-            <param name="loadMode"></param>
         </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.OnSceneUnloaded(UnityEngine.SceneManagement.Scene)">
+        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.DataModels.PrecomputedSceneAreaData.AreasIndex">
             <summary>
-                Event when scene is unloaded
+                List of area bindings to data
             </summary>
-            <param name="scene"></param>
         </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.GetAllRenderers">
+        <member name="T:ProgLibrary.PrecomputedCulling.PrecomputedCulling.DataModels.AreaDataIndex">
             <summary>
-                Get all renderers from all scenes
+                Related OcclusionArea with bake data index
             </summary>
-            <returns></returns>
         </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.AddOcclusionArea(ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea)">
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedCulling.DataModels.AreaDataIndex.#ctor(ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea,System.Int32)">
             <summary>
-                Occlusion area
+                Default constructor
             </summary>
             <param name="precomputedArea"></param>
+            <param name="dataIndex"></param>
         </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.RemoveOcclusionArea(ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea)">
+        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.DataModels.AreaDataIndex.PrecomputedArea">
             <summary>
-                Occlusion area
-            </summary>
-            <param name="precomputedArea"></param>
-        </member>
-        <member name="P:ProgLibrary.PrecomputedCulling.PrecomputedController.IsDirty">
-            <summary>
-                Mark data as dirty and required to be refreshed
+                Reference to <see cref="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.DataModels.AreaDataIndex.PrecomputedArea"/>
             </summary>
         </member>
-        <member name="P:ProgLibrary.PrecomputedCulling.PrecomputedController.IsBaking">
+        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.DataModels.AreaDataIndex.DataIndex">
             <summary>
-                Sets true if occlusion is being baked
+                Index to <see cref="F:ProgLibrary.PrecomputedCulling.DataModels.PrecomputedData.Index"/>
             </summary>
         </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedController._currentAssetsScenes">
+        <member name="T:ProgLibrary.PrecomputedCulling.PrecomputedCulling.Settings.PrecomputedDataSettings">
             <summary>
-                Scenes asset for current scenes in hierarchy
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.OnHierarchyChanged">
-            <summary>
-             On hierarchy changed
+                Main precomputed settings
             </summary>
         </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.OnUpdate">
+        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.Settings.PrecomputedDataSettings._instance">
             <summary>
-                On editor update (hack to initialize scenes after editor load)
+                Get ScriptableObject precomputed settings
             </summary>
         </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.OnEditorSceneClosing(UnityEngine.SceneManagement.Scene,System.Boolean)">
-            <summary>
-                
-            </summary>
-            <param name="scene"></param>
-            <param name="removingScene"></param>
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.OnEditorSaveScene(UnityEngine.SceneManagement.Scene)">
-            <summary>
-                On save scene gather scene info
-            </summary>
-            <param name="scene"></param>
-        </member>
-        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedSceneInfoData._scenesInfo">
-            <summary>
-                Scene info for bake information
-            </summary>
-        </member>
-        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedSceneInfoData.GatherScenesInfo(System.Collections.Generic.List{UnityEditor.SceneAsset})">
-            <summary>
-                Gather info from scenes
-            </summary>
-            <param name="??????"></param>
-            <returns></returns>
+        <member name="P:ProgLibrary.PrecomputedCulling.PrecomputedCulling.Settings.PrecomputedDataSettings.Instance">
+             <see cref="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.Settings.PrecomputedDataSettings._instance"/>
         </member>
         <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.Settings.PrecomputedDataSettings.VariantsSettings">
             <summary>
@@ -1635,6 +1397,15 @@
             <summary>
                 Data provider to save/load variants
             </summary>
+        </member>
+        <member name="P:ProgLibrary.PrecomputedCulling.PrecomputedCulling.Settings.PrecomputedDataSettings.DataProvider">
+             <see cref="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.Settings.PrecomputedDataSettings._dataProvider"/>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedCulling.Settings.PrecomputedDataSettings.GetTypesProvider">
+            <summary>
+                Get possible DataProviders to list them in settings
+            </summary>
+            <returns></returns>
         </member>
         <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.Settings.PrecomputedDataSettings.CellsDivisions">
             <summary>
@@ -1671,12 +1442,781 @@
                 Occlusion Culling should calculate terrain
             </summary>
         </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.Settings.PrecomputedDataSettings.PrecomputedVariantsPath">
+            <summary>
+                Path to Variants folder
+            </summary>
+        </member>
         <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedCulling.Settings.PrecomputedDataSettings.GetValidVariants(System.String)">
             <summary>
                 Get all variants contains sceneName
             </summary>
             <param name="sceneName"></param>
             <returns></returns>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedCulling.Settings.PrecomputedDataSettings.GetTotalBakeTime">
+            <summary>
+                Gather all bakes time
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedCulling.Settings.PrecomputedDataSettings.ValidateBakeVariantData">
+            <summary>
+                Check the baked variants are set up
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedCulling.Settings.PrecomputedDataSettings.RemoveVariant(System.String)">
+            <summary>
+                Delete outdated variant scriptable objects: PrecomputedDataVariant and all PrecomputedData for this variant
+            </summary>
+            <param name="variantID"></param>
+        </member>
+        <member name="T:ProgLibrary.PrecomputedCulling.PrecomputedCulling.MonoBehaviours.PrecomputedSceneSettings">
+            <summary>
+                Occlusion Settings for scene
+                Required to automatically load the correct variants
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.MonoBehaviours.PrecomputedSceneSettings.allVariantsDataSettings">
+            <summary>
+                Reference to main PrecomputedDataSettings
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.MonoBehaviours.PrecomputedSceneSettings.VariantsSettings">
+            <summary>
+                Variants containing the parent scene of this object 
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.MonoBehaviours.PrecomputedSceneSettings.VariantAreaDatas">
+            <summary>
+                List of correlated area and 
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.MonoBehaviours.PrecomputedSceneSettings.loadMethodOn">
+            <summary>
+                Select when Occlusion Culling data should be loaded and applied. It might be useful for loading screens to load them from script/manual.
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.MonoBehaviours.PrecomputedSceneSettings.Priority">
+            <summary>
+                Which General Settings (if multiple are present) should be used to determine current variant.
+                Only applicable when only single variant is applied. If all settings has the same priority, the best matching variant will be used for occlusion
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedCulling.MonoBehaviours.PrecomputedSceneSettings.JoinVariants">
+            <summary>
+                Allow for multiple variants from multiple bakes to be loaded with this variant. This option has no effect when loading from manual/script.
+                All scenes need to have this option selected for it to work, otherwise it will be treated as only single occlusion can be loaded
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedCulling.MonoBehaviours.PrecomputedSceneSettings.AddVariant(ProgLibrary.PrecomputedCulling.PrecomputedCulling.DataModels.PrecomputedSceneVariantData)">
+            <summary>
+                Add new variant
+            </summary>
+            <param name="precomputedSceneVariantData"></param>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedCulling.MonoBehaviours.PrecomputedSceneSettings.RemoveVariant(ProgLibrary.PrecomputedCulling.PrecomputedCulling.DataModels.PrecomputedSceneVariantData)">
+            <summary>
+                Remove variant
+            </summary>
+            <param name="precomputedSceneVariantData"></param>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedCulling.MonoBehaviours.PrecomputedSceneSettings.RefreshVariantsSettings">
+            <summary>
+                Get valid variants for VariantsSettings
+            </summary>
+        </member>
+        <member name="T:ProgLibrary.PrecomputedCulling.PrecomputedCulling.Provider.AssetBundleProvider">
+            <summary>
+                Provider using Assetbundle for packing and loading data
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedCulling.Provider.AssetBundleProvider.GenerateData">
+            <summary>
+                Build Assetbundle for current build target platform
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedCulling.Provider.AssetBundleProvider.GetDataSize">
+            <summary>
+                <see cref="M:IPrecomputedDataProvider.GetDataSize"/>
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedCulling.Provider.AssetBundleProvider.GetCreateTime">
+            <summary>
+                <see cref="M:IPrecomputedDataProvider.GetCreateTime"/>
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedCulling.Provider.AssetBundleProvider.LoadData(System.Int32)">
+            <summary>
+                Checks if asset bundle is already loaded.
+                Loading the proper variant of the data from the assetbundle package
+            </summary>
+            <param name="variantIndex"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ProgLibrary.PrecomputedCulling.PrecomputedController">
+            <summary>
+                Tracks loaded scenes and precomputed area. Mange precomputed data and load variants. Updates the occlusions.
+            </summary>
+        </member>
+        <member name="P:ProgLibrary.PrecomputedCulling.PrecomputedController.Instance">
+            <summary>
+                Singleton of PrecomputedController
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedController._sceneData">
+            <summary>
+                Information about scene
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedController._occlusionAreas">
+            <summary>
+                List of all occlusion areas
+            </summary>
+        </member>
+        <member name="P:ProgLibrary.PrecomputedCulling.PrecomputedController.SceneData">
+            <summary>
+                Information about scene
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.#ctor">
+            <summary>
+                Default constructor
+            </summary>
+        </member>
+        <member name="P:ProgLibrary.PrecomputedCulling.PrecomputedController.RenderersCount">
+            <summary>
+                Get renderers count
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.Initialize_Editor">
+            <summary>
+                Initialize editor callbacks
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.AddScene(UnityEngine.SceneManagement.Scene,System.Boolean)">
+            <summary>
+                Add new sceneData
+            </summary>
+            <param name="scene"></param>
+            <param name="force"></param>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.RemoveScene(UnityEngine.SceneManagement.Scene)">
+            <summary>
+                Remove scene
+            </summary>
+            <param name="scene"></param>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.ForceReinitialize">
+            <summary>
+                Remove all items and reinitialize
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.GatherAllScenes">
+            <summary>
+                Gather all scenes
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.LoadPrecomputedData">
+            <summary>
+                Load occlusionData from variant for current scenes
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.LoadFormSceneSettings(System.Collections.Generic.List{ProgLibrary.PrecomputedCulling.PrecomputedCulling.MonoBehaviours.PrecomputedSceneSettings},System.Boolean)">
+            <summary>
+                Load right variant from PrecomputedSceneSettings list
+            </summary>
+            <param name="precomputedSceneSettingsList"></param>
+            <param name="isAllowVariantsJoin"></param>
+            <returns>List of scene settings that has not been loaded, null if fail load or nothing change</returns>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.BestMatchingVariant(System.Collections.Generic.List{ProgLibrary.PrecomputedCulling.PrecomputedCulling.MonoBehaviours.PrecomputedSceneSettings})">
+            <summary>
+                Find best matching variant for current loaded scenes
+            </summary>
+            <param name="precomputedSceneSettings"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.OnSceneLoaded(UnityEngine.SceneManagement.Scene,UnityEngine.SceneManagement.LoadSceneMode)">
+            <summary>
+                Event when new scene is loaded
+            </summary>
+            <param name="scene"></param>
+            <param name="loadMode"></param>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.OnSceneUnloaded(UnityEngine.SceneManagement.Scene)">
+            <summary>
+                Event when scene is unloaded
+            </summary>
+            <param name="scene"></param>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.GetAllRenderers">
+            <summary>
+                Get all renderers from all scenes
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.CheckIsDirty">
+            <summary>
+                Check if something change in hierarchy while not baking
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.AddOcclusionArea(ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea)">
+            <summary>
+                Add Precomputed area
+            </summary>
+            <param name="precomputedArea"></param>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.AddOcclusionSceneSettings(ProgLibrary.PrecomputedCulling.PrecomputedCulling.MonoBehaviours.PrecomputedSceneSettings)">
+            <summary>
+                Add Precomputed Scene settings
+            </summary>
+            <param name="precomputedSceneSettings"></param>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.RemoveOcclusionArea(ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea)">
+            <summary>
+                Remove Precomputed area
+            </summary>
+            <param name="precomputedArea"></param>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.RemoveOcclusionSceneSettings(ProgLibrary.PrecomputedCulling.PrecomputedCulling.MonoBehaviours.PrecomputedSceneSettings)">
+            <summary>
+                Remove Precomputed Scene settings
+            </summary>
+            <param name="precomputedSceneSettings"></param>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.UpdateVisibility(UnityEngine.Vector3,ProgLibrary.PrecomputedCulling.PrecomputedCamera)">
+            <summary>
+               Updates the occlusions for current camera position 
+            </summary>
+            <param name="cameraLocation"></param>
+            <param name="precomputedCamera"></param>
+        </member>
+        <member name="P:ProgLibrary.PrecomputedCulling.PrecomputedController.SceneBakeData">
+            <summary>
+                Gather <see cref="T:ProgLibrary.PrecomputedCulling.DataModels.SceneData.PrecomputedSceneBakeData"/>
+            </summary>
+        </member>
+        <member name="P:ProgLibrary.PrecomputedCulling.PrecomputedController.IsDirty">
+            <summary>
+                Mark data as dirty and required to be refreshed
+            </summary>
+        </member>
+        <member name="P:ProgLibrary.PrecomputedCulling.PrecomputedController.IsBaking">
+            <summary>
+                Sets true if occlusion is being baked
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedController._currentAssetsScenes">
+            <summary>
+                Scenes asset for current scenes in hierarchy
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:ProgLibrary.PrecomputedCulling.PrecomputedController.CurrentAssetsScenes">
+            <see cref="F:ProgLibrary.PrecomputedCulling.PrecomputedController._currentAssetsScenes"/>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.OnHierarchyChanged">
+            <summary>
+             On hierarchy changed
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.OnUpdate">
+            <summary>
+                On editor update (hack to initialize scenes after editor load)
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.OnEditorSceneClosing(UnityEngine.SceneManagement.Scene,System.Boolean)">
+            <summary>
+                
+            </summary>
+            <param name="scene"></param>
+            <param name="removingScene"></param>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.OnEditorSaveScene(UnityEngine.SceneManagement.Scene)">
+            <summary>
+                On save scene gather scene info
+            </summary>
+            <param name="scene"></param>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedController.CountVisibleRenderers">
+            <summary>
+                Count renderers in all SceneData 
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedCullingRendererId">
+            <summary>
+                Automatically added to occluded object to index them 
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedCullingRendererId.Id">
+            <summary>
+                index of occluded object in scene
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedCullingRendererId.IsValid">
+            <summary>
+                Check required components
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:ProgLibrary.PrecomputedCulling.MonoBehaviours.IdCubemapCamera">
+            <summary>
+                Precomputed bake camera to test visibility form bake spots
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.IdCubemapCamera.CubemapRenderTexture">
+            <summary>
+                Cubemap Rendered 360 texture from current bake spot
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.IdCubemapCamera.EquirectRenderTexture">
+            <summary>
+                Equirect Rendered 360 texture from current bake spot
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.IdCubemapCamera._diffComputeShader">
+            <summary>
+                Compute shader used to calculate diff of the textures
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.IdCubemapCamera.ProgIdDiffComputeShader">
+            <summary>
+                Compute shader name
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.IdCubemapCamera.ZOrderBakeContainers">
+            <summary>
+                Temporary list of zOrdered bake containers required for rendering
+            </summary>
+        </member>
+        <member name="P:ProgLibrary.PrecomputedCulling.MonoBehaviours.IdCubemapCamera.DiffComputeShader">
+            <summary>
+                Compute shader used to calculate diff of the textures
+            </summary>
+        </member>
+        <member name="P:ProgLibrary.PrecomputedCulling.MonoBehaviours.IdCubemapCamera.SelectedIds">
+            <summary>
+                Get list renderers id of selected gameObjects
+            </summary>
+        </member>
+        <member name="P:ProgLibrary.PrecomputedCulling.MonoBehaviours.IdCubemapCamera.Settings">
+            <inheritdoc />
+        </member>
+        <member name="P:ProgLibrary.PrecomputedCulling.MonoBehaviours.IdCubemapCamera.AreaSettings">
+            <summary>
+                Reference to current baked area
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.IdCubemapCamera.Prepare(ProgLibrary.PrecomputedCulling.Settings.PrecomputedBakeIdCubemapSettings@,UnityEngine.Vector3,System.Int32,ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea)">
+            <summary>
+                Prepare camera for testing visibility
+            </summary>
+            <param name="settings"></param>
+            <param name="cameraPosition"></param>
+            <param name="scriptableRendererIndex"></param>
+            <param name="precomputedArea"></param>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.IdCubemapCamera.TestVisibility(ProgLibrary.PrecomputedCulling.Settings.PrecomputedBakeIdCubemapSettings,UnityEngine.Vector3,System.Int32,ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea)">
+            <inheritdoc />
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.IdCubemapCamera.GetLastCameraRenderer">
+            <summary>
+                Temporary list of zOrdered bake containers required for rendering
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.IdCubemapCamera.TestRenderersVisibility">
+            <summary>
+                Perform a test from given camera position
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.IdCubemapCamera.ComputeFinalVisibility">
+            <summary>
+                Compute final object visibility
+            </summary>
+        </member>
+        <member name="T:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingRenderPipeline">
+            <summary>
+                Scriptable renderer pipeline for color coding the objects in the scene
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingRenderPipeline.#ctor(UnityEngine.Rendering.Universal.ScriptableRendererData)">
+            <inheritdoc />
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingRenderPipeline.Setup(UnityEngine.Rendering.ScriptableRenderContext,UnityEngine.Rendering.Universal.RenderingData@)">
+            <inheritdoc />
+        </member>
+        <member name="T:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer">
+            <summary>
+                Management of the rendered image. Drawing objects and distinguishing them.
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer.ZOrderBakeContainers">
+            <summary>
+                Temporary list of zOrdered bake containers required for rendering
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer.BufferName">
+            <summary>
+                Command buffer name
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer._context">
+            <summary>
+                Scriptable render context of current execution
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer._camera">
+            <summary>
+                Currently renderer camera
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer._buffer">
+            <summary>
+                Current command buffer
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer._originalMaterial">
+            <summary>
+                Original material used to generate other for this rendering pipeline
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer._materialsList">
+            <summary>
+                Cache for materials used for current rendering
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer.ColorIndexPropertyId">
+            <summary>
+                Color Index shader property id
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer._settings">
+            <summary>
+                Settings used to display given cubemap -- uses default values if not provided
+            </summary>
+        </member>
+        <member name="P:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer.OriginalMaterial">
+            <summary>
+                Original material used to generate other for this rendering pipeline
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer.Render(UnityEngine.Rendering.ScriptableRenderContext,UnityEngine.Camera)">
+            <summary>
+                Render entry point
+            </summary>
+            <param name="context"></param>
+            <param name="camera"></param>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer.Setup">
+            <summary>
+                Setup rendering process by clearing the screen
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer.DrawVisibleGeometry">
+            <summary>
+                Draws geometry
+            </summary>
+            <exception cref="T:System.ArgumentOutOfRangeException"></exception>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer.IsMaterialTransparent(UnityEngine.Material)">
+            <summary>
+                Check if requested material is Transparent and can be a valid Occluder or Occludee
+            </summary>
+            <param name="material">Material to check</param>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer.Submit">
+            <summary>
+                Submit buffer and end sample for profiler
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingCameraRenderer.ExecuteBuffer">
+            <summary>
+                Execute buffer
+            </summary>
+        </member>
+        <member name="T:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingRenderPipelineAsset">
+            <summary>
+                Custom rendering pipeline asset to color code objects with appropriate index
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.CubeMapCamera.Renderer.ColorIndexingRenderPipelineAsset.Create">
+            <inheritdoc />
+        </member>
+        <member name="T:ProgLibrary.PrecomputedCulling.MonoBehaviours.IVisibilityTester`1">
+            <summary>
+                Interface to test visibility from bake spot
+            </summary>
+            <typeparam name="TSettings"></typeparam>
+        </member>
+        <member name="P:ProgLibrary.PrecomputedCulling.MonoBehaviours.IVisibilityTester`1.Settings">
+            <summary>
+                Settings used with current camera, can be null if not during testing visibility
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.IVisibilityTester`1.TestVisibility(`0,UnityEngine.Vector3,System.Int32,ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea)">
+            <summary>
+                Performs visibility test over all cameras locations
+            </summary>
+            <param name="settings">Occlusion bake settings</param>
+            <param name="cameraPosition"></param>
+            <param name="scriptableRendererIndex">Renderer index for </param>
+            <param name="precomputedArea"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ProgLibrary.PrecomputedCulling.MonoBehaviours.IVisibilityTester">
+            <see cref="T:ProgLibrary.PrecomputedCulling.MonoBehaviours.IVisibilityTester"/>
+        </member>
+        <member name="T:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea">
+            <summary>
+                Area to precomputed. Area settings to bake and runtime culling.
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea.Box">
+            <summary>
+                Bounding box of the occlusion area
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea.precomputedData">
+            <summary>
+                Occlusion data that this occlusion area is using
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea.CellsDivisions">
+            <summary>
+                Amount of cells in this volume in 3d dimension
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea.settingsArea">
+            <summary>
+                Area settings
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea.Priority">
+            <summary>
+                Priority, which occlusion area is used when two are overlapping, higher priority will be used
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea.BakeTransparent">
+            <summary>
+                Transparent objects should get occluded
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea.BakeSprites">
+            <summary>
+                Occlusion Culling should see sprites
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea.BakeTerrain">
+            <summary>
+                Occlusion Culling should calculate terrain
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea._isSceneViewCameraPreview">
+            <summary>
+                Cells visualization
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea._isVisualizeBakeSpots">
+            <summary>
+                Bake spots visualization
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea._isDrawVisibleOnCellSelect">
+            <summary>
+                ShowOcclusionData visualization
+            </summary>
+        </member>
+        <member name="P:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea.IsSceneViewCameraPreview">
+            <see cref="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea._isDrawVisibleOnCellSelect"/>
+        </member>
+        <member name="P:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea.IsVisualizeBakeSpots">
+            <see cref="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea._isVisualizeBakeSpots"/>
+        </member>
+        <member name="P:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea.IsDrawVisibleOnCellSelect">
+            <see cref="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea._isDrawVisibleOnCellSelect"/>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea.GetVisibleRenderers(UnityEngine.Vector3@,ProgLibrary.PrecomputedCulling.DataModels.SceneData.PrecomputedSceneData@,System.Collections.Generic.List{ProgLibrary.PrecomputedCulling.DataModels.PrecomputedVisibilityIndices}@,ProgLibrary.PrecomputedCulling.PrecomputedCamera@)">
+            <summary>
+                Get all renderers visible from given position
+            </summary>
+            <param name="vector3"></param>
+            <param name="targetScene"></param>
+            <param name="indices"></param>
+            <param name="precomputedCamera"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea.CalculateChunkPosition(System.Int32@)">
+            <summary>
+                Calculates position in Vector3 space for given index
+            </summary>
+            <param name="index">Index of the chunk</param>
+            <returns>Position in the middle of the chunk</returns>
+            <remarks>
+                Assume that positive X and positive Y are [0,0] - and thus indexes are towards negative eg: [0, -1] is index
+                1, [-1, 0] is index 64
+            </remarks>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea.GetPositionFromIndex(System.Int32@)">
+            <summary>
+                Get position in 2D space from flattened array index
+            </summary>
+            <param name="index">Index</param>
+            <returns></returns>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.CameraMatrixUtils.BoxToViewportAndDepth(UnityEngine.Camera,ProgLibrary.PrecomputedCulling.DataModels.BoundingBox)">
+            <summary>
+                Using bounding box of the object, calculates Viewport values (Rect) in [0,1] as well as distance from camera (depth) of the furthest points in the box
+            </summary>
+            <param name="camera">Camera to view from</param>
+            <param name="box">Box to calculate against</param>
+            <returns></returns>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.CameraMatrixUtils.PerspectiveOffCenter(UnityEngine.Camera,System.Single@,System.Single@,System.Single@,System.Single@)">
+            <summary>
+                Calculates camera view Frustum using left, right, bottom, top values via matrix multipication
+            </summary>
+            <param name="camera">Camera to calculate matrix from</param>
+            <param name="left">Left value of the view frustum</param>
+            <param name="right">Right value of view frustum</param>
+            <param name="bottom">Bottom value of the view frustum</param>
+            <param name="top">Top value of the view frustum</param>
+            <returns></returns>
+        </member>
+        <member name="T:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera">
+            <summary>
+                Specialized script that controls the camera to always center on <see cref="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera._targetObject" /> and sets view frustum
+                directly at the object.
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera._targetObject">
+            <summary>
+                Object to test against
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera._diffComputeShader">
+            <summary>
+                Compute shader used to calculate diff of the textures
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera._farV">
+            <summary>
+                Cache array to get far view frustum positions
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera._rectV">
+            <summary>
+                Cache array to get object view frustum positions
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera._bottom">
+            <summary>
+                View frustum bottom position
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera._left">
+            <summary>
+                View frustum left position
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera._right">
+            <summary>
+                View frustum right position
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera._top">
+            <summary>
+                View frustum top position
+            </summary>
+        </member>
+        <member name="P:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera.DiffComputeShader">
+            <summary>
+                Compute shader used to calculate diff of the textures
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera.Prepare(ProgLibrary.PrecomputedCulling.Settings.PrecomputedBakeTargetedFrustumSettings@,UnityEngine.Vector3,System.Int32)">
+            <summary>
+                Prepare for visibility test
+            </summary>
+        </member>
+        <member name="P:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera.Settings">
+            <inheritdoc />
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera.TestVisibility(ProgLibrary.PrecomputedCulling.Settings.PrecomputedBakeTargetedFrustumSettings,UnityEngine.Vector3,System.Int32,ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea)">
+            <inheritdoc />
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera.TestRendererVisibility">
+            <summary>
+                Perform a test of a single renderer visibility
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera.ComputeFinalVisibility">
+            <summary>
+                Compute final object visibility
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.MonoBehaviours.FrustumCamera.TargetedFrustumCamera.SetCameraFrustumAtTarget(UnityEngine.Camera,ProgLibrary.PrecomputedCulling.DataModels.SceneData.PrecomputedRendererBakeContainer)">
+            <summary>
+                Set camera view frustum at target
+            </summary>
+            <param name="camera">Camera to position view frustum of</param>
+            <param name="target">Target mesh filter</param>
+        </member>
+        <member name="T:ProgLibrary.PrecomputedCulling.PrecomputedSceneInfoData">
+            <summary>
+                ScriptableObject to save scenes info <see cref="T:ProgLibrary.PrecomputedCulling.PrecomputedCulling.DataModels.SceneData.PrecomputedSceneInfo"/>
+            </summary>
+        </member>
+        <member name="P:ProgLibrary.PrecomputedCulling.PrecomputedSceneInfoData.Instance">
+            <summary>
+                Get ScriptableObject scene info
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedSceneInfoData._scenesInfo">
+            <summary>
+                Scene info for bake information
+            </summary>
+        </member>
+        <member name="P:ProgLibrary.PrecomputedCulling.PrecomputedSceneInfoData.ScenesInfo">
+            <see cref="F:ProgLibrary.PrecomputedCulling.PrecomputedSceneInfoData._scenesInfo"/>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedSceneInfoData.GatherScenesInfo(System.Collections.Generic.List{UnityEditor.SceneAsset})">
+            <summary>
+                Gather info from scenes list. Use to get information about whole variant.
+            </summary>
+            <param name="scenes"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ProgLibrary.PrecomputedCulling.BoundingBoxExtensions">
+            <summary>
+                Static methods for <see cref="T:ProgLibrary.PrecomputedCulling.DataModels.BoundingBox"/>
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.BoundingBoxExtensions.ExpandAA(ProgLibrary.PrecomputedCulling.DataModels.BoundingBox,UnityEngine.Vector3)">
+            <summary>
+                Expands box to contain point
+            </summary>
+            <param name="box"></param>
+            <param name="containPoint"></param>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.BoundingBoxExtensions.DrawHandles(ProgLibrary.PrecomputedCulling.DataModels.BoundingBox)">
+            <summary>
+                Draw box edges line
+            </summary>
+            <param name="box"></param>
+        </member>
+        <member name="T:ProgLibrary.PrecomputedCulling.PrecomputedCamera">
+            <summary>
+                Attached to the camera to apply settings and update visibility
+            </summary>
+        </member>
+        <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedCamera.IsCullingDisable">
+            <summary>
+                Disabling visibility updates
+            </summary>
         </member>
         <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedCamera.MinimalReqVisibility">
             <summary>
@@ -1686,6 +2226,22 @@
         <member name="F:ProgLibrary.PrecomputedCulling.PrecomputedCamera.NeightbourCellsRadius">
             <summary>
                 Multi chunks rendering range
+            </summary>
+        </member>
+        <member name="T:ProgLibrary.PrecomputedCulling.PrecomputedManager">
+            <summary>
+                Prepares Precomputed Culling
+            </summary>
+        </member>
+        <member name="M:ProgLibrary.PrecomputedCulling.PrecomputedManager.Awake">
+            <summary>
+                Initialize controller
+            </summary>
+        </member>
+        <member name="T:ProgLibrary.PrecomputedCulling_Editor.Bake.PrecomputedSaveTexture">
+            <summary>
+                Development class for saving texture.
+                Used to check processed baking textures.
             </summary>
         </member>
         <member name="F:ProgLibrary.PrecomputedCulling_Editor.Bake.PrecomputedSaveTexture.countPicture">
@@ -1729,31 +2285,34 @@
             <param name="renderTexture"></param>
             <returns></returns>
         </member>
-        <member name="F:PrecomputedSceneVariantData.BakeTime">
+        <member name="T:IPrecomputedDataProvider">
             <summary>
-                Bake Time in milliseconds
+                Data provider is a way to bundle your occlusion data into game or application.
             </summary>
         </member>
-        <member name="T:PrecomputedSceneSettings">
+        <member name="M:IPrecomputedDataProvider.GenerateData">
             <summary>
-                Occlusion Settings for scene
-                Required to automatically load the correct variants
+                Processing of the baked data
             </summary>
         </member>
-        <member name="M:PrecomputedSceneSettings.RefreshVariantsSettings">
+        <member name="M:IPrecomputedDataProvider.GetDataSize">
             <summary>
-                Get valid variants for VariantsSettings
+               Data provider size
             </summary>
+            <returns></returns>
         </member>
-        <member name="T:PrecomputedSceneAreaData">
+        <member name="M:IPrecomputedDataProvider.GetCreateTime">
             <summary>
-                Variance data to be correlated with the scene
+                Date of last data provider modification 
             </summary>
+            <returns></returns>
         </member>
-        <member name="T:AreaDataIndex">
+        <member name="M:IPrecomputedDataProvider.LoadData(System.Int32)">
             <summary>
-                Related OcclusionArea with bake data index
+                Load variant to scenes. Load proper <see cref="T:ProgLibrary.PrecomputedCulling.DataModels.PrecomputedData"/> to <see cref="T:ProgLibrary.PrecomputedCulling.MonoBehaviours.PrecomputedArea"/>
             </summary>
+            <param name="variantIndex"></param>
+            <returns></returns>
         </member>
     </members>
 </doc>

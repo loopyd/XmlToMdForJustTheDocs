@@ -1,24 +1,43 @@
-﻿using System.Xml.Serialization;
+﻿using System.Text.RegularExpressions;
+using System.Xml.Serialization;
 
 namespace XmlToMdForJustTheDocs.XmlTypes;
 
 [XmlRoot(ElementName = "member")]
 public class Member
 {
-    private static readonly Dictionary<string, string> _MemberNamePrefixDict = new(StringComparer.OrdinalIgnoreCase)
+    public enum MemberEnum
     {
-        ["F:"] = "Field",
-        ["P:"] = "Property",
-        ["T:"] = "Type",
-        ["E:"] = "Event",
-        ["M:"] = "Method"
+        Field,
+        Property,
+        Type,
+        Event,
+        Method
+    }
+    
+    /// <summary>
+    ///     Dictionary of types that XML can have for their members. Expands each element into it's fully qualified name
+    /// </summary>
+    private static readonly Dictionary<string, MemberEnum> _MemberNamePrefixDict = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["F"] = MemberEnum.Field,
+        ["P"] = MemberEnum.Property,
+        ["T"] = MemberEnum.Type,
+        ["E"] = MemberEnum.Event,
+        ["M"] = MemberEnum.Method
     };
 
     private string _name;
 
+    /// <summary>
+    ///     Member full summary name
+    /// </summary>
     [XmlElement(ElementName = "summary")]
     public Summary? Summary { get; set; }
 
+    /// <summary>
+    ///     Fully qualified name from XML in format X:Namespace.Class...
+    /// </summary>
     [XmlAttribute(AttributeName = "name")]
     public string Name
     {
@@ -26,78 +45,132 @@ public class Member
         set
         {
             _name = value;
-            var extract = ExtractNameAndBodyFromMember();
-            Namespace = extract.Namespace;
-            MemberName = extract.MemberName;
-            TypeName = extract.TypeName;
+            ExtractNameAndBodyFromMember();
         }
     }
 
+    /// <summary>
+    ///     Body of the member
+    /// </summary>
     [XmlText]
     public string Text { get; set; }
 
+    /// <summary>
+    ///     Should this member inherit documentation from it's predecesor
+    /// </summary>
     [XmlElement(ElementName = "inheritdoc")]
     public object Inheritdoc { get; set; }
 
+    /// <summary>
+    ///     Parameters usually used for methods.
+    /// </summary>
     [XmlElement(ElementName = "param")]
     public List<Param> Param { get; set; }
 
+    /// <summary>
+    ///     What give (ussual method) returns
+    /// </summary>
     [XmlElement(ElementName = "returns")]
     public object Returns { get; set; }
 
+    /// <summary>
+    ///     Remarks for the member
+    /// </summary>
     [XmlElement(ElementName = "remarks")]
     public string Remarks { get; set; }
 
+    /// <summary>
+    ///     Exception that given member throws
+    /// </summary>
     [XmlElement(ElementName = "exception")]
     public Exception Exception { get; set; }
 
+    /// <summary>
+    ///     Generic type parameters
+    /// </summary>
     [XmlElement(ElementName = "typeparam")]
     public Typeparam Typeparam { get; set; }
 
+    /// <summary>
+    ///     Helper property to determine if given type is a method
+    /// </summary>
     [XmlIgnore]
     public bool IsMethod => Name.StartsWith("M");
 
+    /// <summary>
+    ///     Helper property to determine if given type is a field
+    /// </summary>
     [XmlIgnore]
     public bool IsField => Name.StartsWith("F");
 
+    /// <summary>
+    ///     Helper property to determine if given type is a property
+    /// </summary>
     [XmlIgnore]
     public bool IsProperty => Name.StartsWith("P");
 
+    /// <summary>
+    ///     Helper property to determine if given type is a type
+    /// </summary>
     [XmlIgnore]
     public bool IsType => Name.StartsWith("T");
 
+    /// <summary>
+    ///     Helper property to determine if given type is a event
+    /// </summary>
     [XmlIgnore]
     public bool IsEvent => Name.StartsWith("E");
 
+    /// <summary>
+    ///     Converted value from fully qualified XML <see cref="Name"/> to a namespace.
+    /// </summary>
     [XmlIgnore]
     public string Namespace { get; private set; } = null!;
 
+    /// <summary>
+    ///     Converted value from full qualified XML <see cref="Name"/> to a member name.
+    /// </summary>
     [XmlIgnore]
     public string MemberName { get; private set; } = null!;
-
+    
+    /// <summary>
+    ///     Converted value from full qualified XML <see cref="Name"/> to a class name.
+    /// </summary>
     [XmlIgnore]
-    public string TypeName { get; private set; } = null!;
+    public string ClassName { get; private set; } = null!;
 
-    private (string TypeName, string MemberName, string Namespace) ExtractNameAndBodyFromMember()
+    /// <summary>
+    ///     Converted value from full qualified XML <see cref="Name"/> to a type name.
+    /// </summary>
+    [XmlIgnore]
+    public MemberEnum TypeName { get; private set; }
+
+    private void ExtractNameAndBodyFromMember()
     {
-        int IndexOfOrMax(string text, char sign)
+        if (string.IsNullOrEmpty(Name))
+        {
+            return;
+        }
+
+        TypeName = GetTypeName(Name);
+        var isGenericOrHasParams = Regex.Matches(Name, @"([\(|\`].+[\)])");
+        if (isGenericOrHasParams.Count == 0)
+        {
+            ExtractNamespaceAndNames(Name);
+        }
+        else
+        {
+            
+        }
+        /*int IndexOfOrMax(string text, char sign)
         {
             var index = text.IndexOf(sign);
             return index == -1
                 ? int.MaxValue
                 : index;
-        }
-
-        if (string.IsNullOrEmpty(Name))
-        {
-            return (String.Empty, String.Empty, String.Empty);
-        }
-
-        var newName = Name;
-        var typeName = _MemberNamePrefixDict[newName.Split(':', 2)[0] + ":"];
-        newName = newName.Split(':', 2)[1];
-        /*newName = _PrefixReplacerRegex.Replace(newName,
-            match => _MemberNamePrefixDict[match.Value] + " "); //expand prefixes into more verbose words for member.*/
+        }*/
+        
+        /*var newName = Name.Split(':', 2)[1];
         var endOfMethodName = Math.Min(IndexOfOrMax(newName, '`'), IndexOfOrMax(newName, '('));
         string name, namespaceName;
         if (endOfMethodName != int.MaxValue)
@@ -122,6 +195,55 @@ public class Member
             }
         }
 
-        return (typeName.Trim(), name.Trim(), namespaceName.Trim());
+        TypeName = typeName;
+        Name = name.Trim();
+        Namespace = namespaceName.Trim();*/
+    }
+
+    /// <summary>
+    ///     Extracts <see cref="Namespace"/> <see cref="MemberName"/> and <see cref="ClassName"/> to this instance members based on XML name withoug it's parameters
+    /// </summary>
+    /// <param name="name"></param>
+    /// <example>
+    ///     <code>
+    ///         ExtractNamespaceAndNames("T:System.ArgumentException"); // Correct
+    ///         ExtractNamespaceAndNames("P:ProgLibrary.PrecomputedCulling.MonoBehaviours.IdCubemapCamera.Settings"); // Correct
+    ///         ExtractNamespaceAndNames("M:ProgLibrary.PrecomputedCulling.Utils.ArrayUtils.CopyArray``1(``0[])"); // Incorrect
+    ///     </code>
+    /// </example>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    private void ExtractNamespaceAndNames(string name)
+    {
+        var fullName = Regex.Match(name, @"\w:(.+)").Groups[1].Value;
+        var split = fullName.Split(".");
+        switch (TypeName)
+        {
+            case MemberEnum.Type:
+                Namespace = string.Join(".", split, 0, split.Length - 1);
+                MemberName = split[^1];
+                ClassName = split[^1];
+                break;
+            case MemberEnum.Field:
+            case MemberEnum.Property:
+            case MemberEnum.Event:
+            case MemberEnum.Method:
+                Namespace = string.Join(".", split, 0, split.Length - 2);
+                MemberName = split[^1];
+                ClassName = split[^2];
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    /// <summary>
+    ///     Returns TypeName based on <see cref="_MemberNamePrefixDict"/>
+    /// </summary>
+    /// <param name="name">Requires fully qualified xml name</param>
+    /// <returns>Returns new string based on <see cref="_MemberNamePrefixDict"/></returns>
+    private static MemberEnum GetTypeName(string name)
+    {
+        var typeName = _MemberNamePrefixDict[name[0].ToString()];
+        return typeName;
     }
 }
