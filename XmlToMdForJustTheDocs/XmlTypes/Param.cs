@@ -12,5 +12,11 @@ public class Param {
     public string Text { get; set; } 
 
     [XmlElement(ElementName="see")] 
-    public See See { get; set; } 
+    public See See { get; set; }
+
+    [XmlIgnore]
+    public bool ByRef { get; set; }
+    
+    [XmlIgnore]
+    public string Type { get; set; }
 }

@@ -27,7 +27,11 @@ public class Member
         ["M"] = MemberEnum.Method
     };
 
-    private string _name;
+    private bool _isCreated = false;
+    private string _ns = null!;
+    private string _memberName = null!;
+    private string _className = null!;
+    private MemberEnum _typeName;
 
     /// <summary>
     ///     Member full summary name
@@ -39,15 +43,7 @@ public class Member
     ///     Fully qualified name from XML in format X:Namespace.Class...
     /// </summary>
     [XmlAttribute(AttributeName = "name")]
-    public string Name
-    {
-        get => _name;
-        set
-        {
-            _name = value;
-            ExtractNameAndBodyFromMember();
-        }
-    }
+    public string Name { get; set; }
 
     /// <summary>
     ///     Body of the member
@@ -125,42 +121,107 @@ public class Member
     ///     Converted value from fully qualified XML <see cref="Name"/> to a namespace.
     /// </summary>
     [XmlIgnore]
-    public string Namespace { get; private set; } = null!;
+    public string Namespace
+    {
+        get
+        {
+            if(!_isCreated)             
+                ExtractNameAndBodyFromMember();
+            return _ns;
+        }
+        private set => _ns = value;
+    }
 
     /// <summary>
     ///     Converted value from full qualified XML <see cref="Name"/> to a member name.
     /// </summary>
     [XmlIgnore]
-    public string MemberName { get; private set; } = null!;
-    
+    public string MemberName
+    {
+        get
+        {
+            if(!_isCreated)             
+                ExtractNameAndBodyFromMember();
+            return _memberName;
+        }
+        private set => _memberName = value;
+    }
+
     /// <summary>
     ///     Converted value from full qualified XML <see cref="Name"/> to a class name.
     /// </summary>
     [XmlIgnore]
-    public string ClassName { get; private set; } = null!;
+    public string ClassName
+    {
+        get
+        {
+            if(!_isCreated)             
+                ExtractNameAndBodyFromMember();
+            return _className;
+        }
+        private set => _className = value;
+    }
 
     /// <summary>
     ///     Converted value from full qualified XML <see cref="Name"/> to a type name.
     /// </summary>
     [XmlIgnore]
-    public MemberEnum TypeName { get; private set; }
+    public MemberEnum TypeName
+    {
+        get
+        {
+            if(!_isCreated)             
+                ExtractNameAndBodyFromMember();
+            return _typeName;
+        }
+        private set => _typeName = value;
+    }
+
+    public void InitializeMember()
+    {
+        ExtractNameAndBodyFromMember();
+    }
 
     private void ExtractNameAndBodyFromMember()
     {
+        if(_isCreated) return;
+        _isCreated = true;
         if (string.IsNullOrEmpty(Name))
         {
             return;
         }
 
         TypeName = GetTypeName(Name);
-        var isGenericOrHasParams = Regex.Matches(Name, @"([\(|\`].+[\)])");
-        if (isGenericOrHasParams.Count == 0)
+        var nameSplit = Regex.Split(Name, @"([\(|\`].+[\)])");
+        if (nameSplit.Length <= 1)
         {
             ExtractNamespaceAndNames(Name);
         }
         else
         {
-            
+            ExtractNamespaceAndNames(nameSplit[0]);
+            var parameters = Regex.Match(nameSplit[1], @"\((.+?[,)])+");
+            var list = new List<string>();
+            for (var groupCtr = 1; groupCtr < parameters.Groups.Count; groupCtr++)
+            {
+                for (var captureCtr = 0; captureCtr < parameters.Groups[groupCtr].Captures.Count; captureCtr++)
+                {
+                    list.Add(parameters.Groups[groupCtr].Captures[captureCtr].Value.TrimEnd(',', ')'));
+                }
+            }
+
+            var genericParametersCount = Regex.Match(nameSplit[1], @"``(\w+)\(");
+            var isGeneric = genericParametersCount.Length != 0;
+
+            for (var i = 0; i < list.Count; i++)
+            {
+                if (list[i][^1] == '@')
+                {
+                    Param[i].ByRef = true;
+                }
+
+                Param[i].Type = list[i].TrimEnd('@');
+            }
         }
         /*int IndexOfOrMax(string text, char sign)
         {
@@ -201,7 +262,7 @@ public class Member
     }
 
     /// <summary>
-    ///     Extracts <see cref="Namespace"/> <see cref="MemberName"/> and <see cref="ClassName"/> to this instance members based on XML name withoug it's parameters
+    ///     Extracts <see cref="Namespace"/> <see cref="MemberName"/> and <see cref="ClassName"/> to this instance members based on XML name without it's parameters
     /// </summary>
     /// <param name="name"></param>
     /// <example>

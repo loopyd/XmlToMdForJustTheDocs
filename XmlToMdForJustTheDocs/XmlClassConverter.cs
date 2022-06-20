@@ -11,6 +11,11 @@ public class XmlClassConverter
         var serializer = new XmlSerializer(typeof(Documentation));
         using var reader = File.OpenText(options.InputFile);
         var documentation = (Documentation)serializer.Deserialize(reader);
+        foreach (var member in documentation.Members.MembersList)
+        {
+            member.InitializeMember();
+        }
+        var a = documentation.Members.TypeMembers.Value;
         return documentation;
     }
 
