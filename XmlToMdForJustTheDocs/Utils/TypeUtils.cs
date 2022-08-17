@@ -1,6 +1,5 @@
 namespace XmlToMdForJustTheDocs.Utils
 {
-
     // This isn't used yet but probably should be in some places.
     public static class TypeUtilities
     {
@@ -16,5 +15,4 @@ namespace XmlToMdForJustTheDocs.Utils
             return false;
         }
     }
-
 }

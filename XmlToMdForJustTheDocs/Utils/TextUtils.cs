@@ -2,14 +2,14 @@
 
 namespace XmlToMdForJustTheDocs.Utils
 {
-    public static class TextUtils
+    public static class TextUtilities
     {
         #region Private Fields
         private static Regex _removeSpacesRegex;
         #endregion
 
         #region Methods
-        static TextUtils()
+        static TextUtilities()
         {
             RegexOptions options = RegexOptions.Compiled;
             _removeSpacesRegex = new Regex("[ ]{2,}", options);
