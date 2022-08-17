@@ -1,89 +1,95 @@
 ﻿using System.Text;
 using System.Xml.Serialization;
 using XmlToMdForJustTheDocs.XmlTypes;
+using XmlToMdForJustTheDocs.Models;
+using XmlToMdForJustTheDocs.Utils;
 
-namespace XmlToMdForJustTheDocs;
-
-public class XmlClassConverter
+namespace XmlToMdForJustTheDocs
 {
-    public Documentation Convert(Options options)
+    public class XmlClassConverter
     {
-        var serializer = new XmlSerializer(typeof(Documentation));
-        using var reader = File.OpenText(options.InputFile);
-        var documentation = (Documentation)serializer.Deserialize(reader);
-        foreach (var member in documentation.Members.MembersList)
+        #region Public Methods
+        public Documentation Convert(Options options)
         {
-            member.InitializeMember();
-        }
-        var a = documentation.Members.TypeMembers.Value;
-        return documentation;
-    }
-
-    public void Generate(Documentation documentation, Options options)
-    {
-        var outputFolder = new DirectoryInfo(options.OutputDirectory);
-
-        var versionFolder = outputFolder.CreateChildFolder(options.Version);
-        var assemblyFolder = versionFolder.CreateChildFolder(documentation.Assembly.Name);
-        var md = new MdGenerator();
-
-        foreach (var member in documentation.Members.MembersList)
-        {
-            var jtd = new Jtd
-            {
-                Title = member.Namespace + "." + member.MemberName,
-            };
-            md.JtdToHeader(jtd);
-            md.H1(member.MemberName);
-            md.H4($"{member.TypeName}: {member.MemberName}");
-            md.H5($"Namespace: {member.Namespace}");
-            md.AppendLine();
-            md.H3("Summary");
-            if (member.Summary != null)
-            {
-                md.IndentText(member.Summary.Text);
-
-                if (member.Summary.Remarks.Count != 0)
+            var serializer = new XmlSerializer(typeof(Documentation));
+            Documentation documentation = new Documentation();
+            using (var reader = File.OpenText(options.InputFile)) {
+                var result = serializer.Deserialize(reader);
+#pragma warning disable CS8604  // Helper Utility tests cast isn't null.
+                if (TypeUtilities.TryCast<Documentation>(result, out var documentation2))
+#pragma warning restore CS8604  // Helper Utility tests cast isn't null.
                 {
-                    md.H3("Remarks");
-                    foreach (var remark in member.Summary.Remarks)
+                    documentation = documentation2;
+                    foreach (var member in documentation.Members.MembersList)
                     {
-                        md.IndentText(remark);
+                        member.InitializeMember();
+                    }
+                    var a = documentation.Members.TypeMembers.Value;
+                }
+            }
+            return documentation;
+        }
+
+        public void Generate(Documentation documentation, Options options)
+        {
+            var outputFolder = new DirectoryInfo(options.OutputDirectory);
+
+            var versionFolder = outputFolder.CreateChildFolder(options.Version);
+            var assemblyFolder = versionFolder.CreateChildFolder(documentation.Assembly.Name);
+            var md = new MdGenerator();
+
+            foreach (var member in documentation.Members.MembersList)
+            {
+                var jtd = new Jtd
+                {
+                    Title = member.Namespace + "." + member.MemberName,
+                };
+                md.JtdToHeader(jtd);
+                md.H1(member.MemberName);
+                md.H4($"{member.TypeName}: {member.MemberName}");
+                md.H5($"Namespace: {member.Namespace}");
+                md.AppendLine();
+                md.H3("Summary");
+                if (member.Summary != null)
+                {
+                    md.IndentText(member.Summary.Text);
+
+                    if (member.Summary.Remarks.Count != 0)
+                    {
+                        md.H3("Remarks");
+                        foreach (var remark in member.Summary.Remarks)
+                        {
+                            md.IndentText(remark);
+                        }
                     }
                 }
             }
         }
-    }
-}
-
-public class Jtd
-{
-    public string Layout { get; set; } = "default";
-    public string? Title { get; set; }
-    public int? NavigationOrder { get; set; }
-    public string? Permalink { get; set; }
-    public bool? HasChildren { get; set; }
-}
-
-public static class FileInfoUtils
-{
-    public static bool IsDirectory(this FileSystemInfo path)
-    {
-        return path is DirectoryInfo;
+        #endregion
     }
 
-    public static bool IsFile(this FileSystemInfo path)
+    public static class FileInfoUtils
     {
-        return path is not DirectoryInfo;
-    }
-
-    public static FileSystemInfo CreateChildFolder(this FileSystemInfo root, string folder)
-    {
-        if (!root.IsDirectory())
+        #region Public Methods
+        public static bool IsDirectory(this FileSystemInfo path)
         {
-            throw new ArgumentException("provided FileSystemInfo was not a directory but a file");
+            return path is DirectoryInfo;
         }
 
-        return Directory.CreateDirectory(root.FullName + "/" + folder);
+        public static bool IsFile(this FileSystemInfo path)
+        {
+            return path is not DirectoryInfo;
+        }
+
+        public static FileSystemInfo CreateChildFolder(this FileSystemInfo root, string folder)
+        {
+            if (!root.IsDirectory())
+            {
+                throw new ArgumentException("provided FileSystemInfo was not a directory but a file");
+            }
+
+            return Directory.CreateDirectory(root.FullName + "/" + folder);
+        }
+        #endregion
     }
 }

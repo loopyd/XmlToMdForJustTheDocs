@@ -1,22 +1,31 @@
 ﻿using System.Xml.Serialization;
 
-namespace XmlToMdForJustTheDocs.XmlTypes;
+namespace XmlToMdForJustTheDocs.XmlTypes
+{
 
-[XmlRoot(ElementName="param")]
-public class Param { 
+    [XmlRoot(ElementName = "param")]
+    public class Param
+    {
+        #region Public Fields
+        private string _Name = string.Empty;
+        [XmlAttribute(AttributeName = "name")]
+        public string Name { get => _Name; set => _Name = value; }
 
-    [XmlAttribute(AttributeName="name")] 
-    public string Name { get; set; } 
+        private string _Text = string.Empty;
+        [XmlText]
+        public string Text { get => _Text; set => _Text = value; }
 
-    [XmlText] 
-    public string Text { get; set; } 
+        private See _See = new See();
+        [XmlElement(ElementName = "see")]
+        public See See { get => _See; set => _See = value; }
 
-    [XmlElement(ElementName="see")] 
-    public See See { get; set; }
+        private bool _ByRef = false;
+        [XmlIgnore]
+        public bool ByRef { get => _ByRef; set => _ByRef = value; }
 
-    [XmlIgnore]
-    public bool ByRef { get; set; }
-    
-    [XmlIgnore]
-    public string Type { get; set; }
+        private string _Type = string.Empty;
+        [XmlIgnore]
+        public string Type { get => _Type; set => _Type = value; }
+        #endregion
+    }
 }

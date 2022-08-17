@@ -1,13 +1,19 @@
 ﻿using System.Xml.Serialization;
 
-namespace XmlToMdForJustTheDocs.XmlTypes;
+namespace XmlToMdForJustTheDocs.XmlTypes
+{
+    [XmlRoot(ElementName = "typeparam")]
+    public class Typeparam
+    {
 
-[XmlRoot(ElementName="typeparam")]
-public class Typeparam { 
+        #region Public Fields
+        private string _Name = string.Empty;
+        [XmlAttribute(AttributeName = "name")]
+        public string Name { get => _Name; set => _Name = value; }
 
-    [XmlAttribute(AttributeName="name")] 
-    public string Name { get; set; } 
-
-    [XmlText] 
-    public string Text { get; set; } 
+        private string _Text = string.Empty;
+        [XmlText]
+        public string Text { get => _Text; set => _Text = value; }
+        #endregion
+    }
 }

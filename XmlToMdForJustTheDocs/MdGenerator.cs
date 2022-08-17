@@ -1,204 +1,210 @@
 ﻿using System.Text;
+using XmlToMdForJustTheDocs.Models;
 
-namespace XmlToMdForJustTheDocs;
-
-public class MdGenerator
+namespace XmlToMdForJustTheDocs
 {
-    public StringBuilder _sb = new StringBuilder();
-    
-    public void H1(string value)
+    public class MdGenerator
     {
-        _sb.AppendLine($"# {value}");
-    }
+        #region Public Fields
+        public StringBuilder _sb = new StringBuilder();
+        #endregion
 
-    public void H2(string value)
-    {
-        _sb.AppendLine($"## {value}");
-    }
-
-    public void H3(string value)
-    {
-        _sb.AppendLine($"### {value}");
-    }
-
-    public void H4(string value)
-    {
-        _sb.AppendLine($"#### {value}");
-    }
-
-    public void H5(string value)
-    {
-        _sb.AppendLine($"##### {value}");
-    }
-
-    public void H6(string value)
-    {
-        _sb.AppendLine($"###### {value}");
-    }
-
-    public void AltH1(string value)
-    {
-        _sb.AppendLine($"{value}\n======");
-    }
-
-    public void AltH2(string value)
-    {
-        _sb.AppendLine($"{value}\n------");
-    }
-
-    public void Separator()
-    {
-        _sb.AppendLine("---");
-    }
-
-    public void Italics(string value)
-    {
-        _sb.AppendLine($"_{value}_");
-    }
-
-    public void Bold(string value)
-    {
-        _sb.AppendLine($"**{value}**");
-    }
-
-    public void Strikethrough(string value)
-    {
-        _sb.AppendLine($"~~{value}~~");
-    }
-
-    public void Quote(string value)
-    {
-        _sb.AppendLine($"> {value}");
-    }
-
-    public void OrderedList(IEnumerable<string> value, int subList = 0)
-    {
-        var sb = new StringBuilder();
-        var i = 1;
-        foreach (var item in value)
+        #region Methods
+        public void H1(string value)
         {
-            for (var j = 0; j < subList; j++)
+            _sb.AppendLine($"# {value}");
+        }
+
+        public void H2(string value)
+        {
+            _sb.AppendLine($"## {value}");
+        }
+
+        public void H3(string value)
+        {
+            _sb.AppendLine($"### {value}");
+        }
+
+        public void H4(string value)
+        {
+            _sb.AppendLine($"#### {value}");
+        }
+
+        public void H5(string value)
+        {
+            _sb.AppendLine($"##### {value}");
+        }
+
+        public void H6(string value)
+        {
+            _sb.AppendLine($"###### {value}");
+        }
+
+        public void AltH1(string value)
+        {
+            _sb.AppendLine($"{value}\n======");
+        }
+
+        public void AltH2(string value)
+        {
+            _sb.AppendLine($"{value}\n------");
+        }
+
+        public void Separator()
+        {
+            _sb.AppendLine("---");
+        }
+
+        public void Italics(string value)
+        {
+            _sb.AppendLine($"_{value}_");
+        }
+
+        public void Bold(string value)
+        {
+            _sb.AppendLine($"**{value}**");
+        }
+
+        public void Strikethrough(string value)
+        {
+            _sb.AppendLine($"~~{value}~~");
+        }
+
+        public void Quote(string value)
+        {
+            _sb.AppendLine($"> {value}");
+        }
+
+        public void OrderedList(IEnumerable<string> value, int subList = 0)
+        {
+            var sb = new StringBuilder();
+            var i = 1;
+            foreach (var item in value)
             {
-                sb.Append("..");
+                for (var j = 0; j < subList; j++)
+                {
+                    sb.Append("..");
+                }
+
+                sb.AppendLine($"{i}. {item}");
             }
 
-            sb.AppendLine($"{i}. {item}");
+            _sb.AppendLine(sb.ToString());
         }
 
-        _sb.AppendLine(sb.ToString());
-    }
-
-    public void UnorderedList(IEnumerable<string> value, int subList = 0)
-    {
-        var sb = new StringBuilder();
-        foreach (var item in value)
+        public void UnorderedList(IEnumerable<string> value, int subList = 0)
         {
-            for (var j = 0; j < subList; j++)
+            var sb = new StringBuilder();
+            foreach (var item in value)
             {
-                sb.Append("⋅⋅");
+                for (var j = 0; j < subList; j++)
+                {
+                    sb.Append("⋅⋅");
+                }
+
+                sb.AppendLine($"* {item}");
             }
 
-            sb.AppendLine($"* {item}");
+            _sb.AppendLine(sb.ToString());
         }
 
-        _sb.AppendLine(sb.ToString());
-    }
-
-    public void Link(string text, string url)
-    {
-        _sb.AppendLine($"[{text}]({url})");
-    }
-
-    public void Link(string url)
-    {
-        _sb.AppendLine($"[{url}]({url})");
-    }
-
-    public void Code(string code)
-    {
-        _sb.AppendLine($"```csharp\n{code}\n```");
-    }
-
-    public void Table(IEnumerable<string> headers, params IEnumerable<string>[] items)
-    {
-        var sb = new StringBuilder();
-        var headersList = headers.ToList();
-        sb.AppendLine(string.Join(" | ", headersList));
-        sb.AppendLine(string.Join(" | ", headersList.Select(x => "---")));
-        foreach (var enumerable in items)
+        public void Link(string text, string url)
         {
-            sb.AppendLine(string.Join(" | ", enumerable));
+            _sb.AppendLine($"[{text}]({url})");
         }
 
-        _sb.AppendLine(sb.ToString());
-    }
-
-    public void Property( string value, string name)
-    {
-        _sb.AppendLine($"{name}: {value}");
-    }
-
-    public void Property(bool value, string name)
-    {
-        _sb.AppendLine($"{name}: {(value ? "true" : "false")}");
-    }
-
-    public void Property(int value, string name)
-    {
-        _sb.AppendLine($"{name}: {value}");
-    }
-
-    public void JtdToHeader(Jtd jtd)
-    {
-        Separator();
-
-        Property(jtd.Layout, "layout");
-        if (jtd.Title != null)
+        public void Link(string url)
         {
-            Property(jtd.Title, "title");
+            _sb.AppendLine($"[{url}]({url})");
         }
 
-        if (jtd.NavigationOrder != null)
+        public void Code(string code)
         {
-            Property(jtd.NavigationOrder.Value, "nav_order");
+            _sb.AppendLine($"```csharp\n{code}\n```");
         }
 
-        if (jtd.HasChildren != null)
+        public void Table(IEnumerable<string> headers, params IEnumerable<string>[] items)
         {
-            Property(jtd.HasChildren.Value, "has_children");
+            var sb = new StringBuilder();
+            var headersList = headers.ToList();
+            sb.AppendLine(string.Join(" | ", headersList));
+            sb.AppendLine(string.Join(" | ", headersList.Select(x => "---")));
+            foreach (var enumerable in items)
+            {
+                sb.AppendLine(string.Join(" | ", enumerable));
+            }
+
+            _sb.AppendLine(sb.ToString());
         }
 
-        if (jtd.Permalink != null)
+        public void Property(string value, string name)
         {
-            Property(jtd.Permalink, "permalink");
+            _sb.AppendLine($"{name}: {value}");
         }
 
-        Separator();
-    }
-
-    public void AppendLine()
-    {
-        _sb.AppendLine();
-    }
-
-    public override string ToString()
-    {
-        return _sb.ToString();
-    }
-
-    public void Text(string? text)
-    {
-        if (text != null)
+        public void Property(bool value, string name)
         {
-            _sb.AppendLine(text.Trim());
+            _sb.AppendLine($"{name}: {(value ? "true" : "false")}");
         }
-    }
-    
-    public void IndentText(string? text)
-    {
-        if (text != null)
+
+        public void Property(int value, string name)
         {
-            _sb.AppendLine("\n⋅⋅⋅" + text.Trim());
+            _sb.AppendLine($"{name}: {value}");
         }
+
+        public void JtdToHeader(Jtd jtd)
+        {
+            Separator();
+
+            Property(jtd.Layout, "layout");
+            if (jtd.Title != string.Empty)
+            {
+                Property(jtd.Title, "title");
+            }
+
+            if (jtd.NavigationOrder != 0)
+            {
+                Property(jtd.NavigationOrder, "nav_order");
+            }
+
+            if (jtd.HasChildren == true)
+            {
+                Property(jtd.HasChildren, "has_children");
+            }
+
+            if (jtd.Permalink != string.Empty)
+            {
+                Property(jtd.Permalink, "permalink");
+            }
+
+            Separator();
+        }
+
+        public void AppendLine()
+        {
+            _sb.AppendLine();
+        }
+
+        public override string ToString()
+        {
+            return _sb.ToString();
+        }
+
+        public void Text(string? text)
+        {
+            if (text != null)
+            {
+                _sb.AppendLine(text.Trim());
+            }
+        }
+
+        public void IndentText(string? text)
+        {
+            if (text != null)
+            {
+                _sb.AppendLine("\n⋅⋅⋅" + text.Trim());
+            }
+        }
+        #endregion
     }
 }

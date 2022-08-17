@@ -1,13 +1,19 @@
 ﻿using System.Xml.Serialization;
 
-namespace XmlToMdForJustTheDocs.XmlTypes;
+namespace XmlToMdForJustTheDocs.XmlTypes
+{
+    [XmlRoot(ElementName = "exception")]
+    public class Exception
+    {
 
-[XmlRoot(ElementName="exception")]
-public class Exception { 
+        #region Public Fields
+        private string _Cref = string.Empty;
+        [XmlAttribute(AttributeName = "cref")]
+        public string Cref { get => _Cref; set => _Cref = value; }
 
-    [XmlAttribute(AttributeName="cref")] 
-    public string Cref { get; set; } 
-
-    [XmlText] 
-    public string Text { get; set; } 
+        private string _Text = string.Empty;
+        [XmlText]
+        public string Text { get => _Text; set => _Text = value; }
+        #endregion
+    }
 }
